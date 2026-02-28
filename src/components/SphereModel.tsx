@@ -33,7 +33,7 @@ export default function SphereModel() {
   })
 
   return (
-    <group rotation={[0.17, 0, 0.5]} position={[0, 0, 0]}>
+    <group rotation={[0.2, 0, 0.45]} position={[0, 0, 0]}>
       <group
         ref={ref}
         onClick={() => setScene('ENTERING_SPHERE')}

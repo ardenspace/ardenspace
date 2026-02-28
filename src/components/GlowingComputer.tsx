@@ -1,20 +1,44 @@
+import { useEffect } from 'react'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { useStore } from '../stores/useStore'
 
-function isComputerMesh(name: string) {
-  return /mac|crt|portcover/i.test(name)
+// Only the center computer (no .001, .002, etc. suffix)
+const centerMeshNames = new Set([
+  'MacUnit_Mac_0',
+  'MacUnit_MacMetal_0',
+  'CRT_TVScreen_0',
+  'PortCover_Mac_0',
+])
+
+function isCenterComputer(name: string) {
+  return centerMeshNames.has(name)
 }
 
 export default function GlowingComputer() {
   const { scene } = useGLTF('/ardensgarden.glb')
   const setScene = useStore((s) => s.setScene)
 
+  // Hide the glass sphere shell when viewing from inside
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (child.name === 'GlassSphere' || child.name === 'Sphere.052') {
+        child.visible = false
+      }
+    })
+    return () => {
+      scene.traverse((child) => {
+        if (child.name === 'GlassSphere' || child.name === 'Sphere.052') {
+          child.visible = true
+        }
+      })
+    }
+  }, [scene])
+
   const handleClick = (e: { object: THREE.Object3D; stopPropagation: () => void }) => {
-    // Walk up ancestors to check if any mesh in the click chain is a computer part
     let obj: THREE.Object3D | null = e.object
     while (obj) {
-      if (isComputerMesh(obj.name)) {
+      if (isCenterComputer(obj.name)) {
         e.stopPropagation()
         setScene('PC_SCREEN')
         return
@@ -26,7 +50,6 @@ export default function GlowingComputer() {
   return (
     <group onClick={handleClick}>
       <primitive object={scene} />
-      <pointLight position={[0, 0.5, 0]} color="#4488ff" intensity={2} distance={3} />
     </group>
   )
 }

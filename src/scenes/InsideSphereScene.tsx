@@ -1,19 +1,20 @@
 import { OrbitControls } from '@react-three/drei'
 import GlowingComputer from '../components/GlowingComputer'
+import Starfield from '../components/Starfield'
 
 export default function InsideSphereScene() {
   return (
     <>
       <ambientLight intensity={0.3} />
       <OrbitControls
-        enableRotate={false}
+        enableRotate={true}
         enableZoom={true}
-        enablePan={true}
-        mouseButtons={{ LEFT: 2, MIDDLE: undefined, RIGHT: undefined }}
+        enablePan={false}
+        rotateSpeed={0.5}
         minDistance={0.5}
         maxDistance={5}
-        panSpeed={0.5}
       />
+      <Starfield />
       <GlowingComputer />
     </>
   )

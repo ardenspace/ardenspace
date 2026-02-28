@@ -10,11 +10,10 @@ export function useCameraTransition() {
 
   useEffect(() => {
     if (scene === 'ENTERING_SPHERE') {
-      // Fly towards sphere (positioned at [2, 1.5, 0]), then into inside view
       gsap.to(camera.position, {
         x: 0,
-        y: 1.2,
-        z: 2,
+        y: -0.1,
+        z: 2.8,
         duration: 2,
         ease: 'power2.inOut',
         onUpdate: () => camera.lookAt(0, 0, 0),
