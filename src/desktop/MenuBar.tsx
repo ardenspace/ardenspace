@@ -1,6 +1,39 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { BsStars } from "react-icons/bs";
 import { useStore } from '../stores/useStore'
 import { useT } from '../i18n'
+
+function MenuItem({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left px-3 py-1.5 hover:bg-white/10 text-white/80 text-xs cursor-pointer"
+    >
+      {children}
+    </button>
+  )
+}
+
+function Clock() {
+  const [now, setNow] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const formatted = now.toLocaleDateString('ko-KR', {
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  }) + ' ' + now.toLocaleTimeString('ko-KR', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  return <span className="text-xs font-bold">{formatted}</span>
+}
 
 export default function MenuBar() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -10,47 +43,54 @@ export default function MenuBar() {
   const lang = useStore((s) => s.lang)
   const setLang = useStore((s) => s.setLang)
   const t = useT()
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [menuOpen])
 
   return (
-    <div className="h-7 flex items-center justify-between px-4 glass text-white/80 text-xs rounded-none border-x-0 border-t-0 relative z-50">
-      {/* Left: Star menu */}
-      <div className="relative">
+    <div className="absolute top-1 left-3 right-3 h-7 flex items-center justify-between px-4 text-white/80 text-xs z-50">
+      {/* Left: Icon + menu */}
+      <div ref={menuRef} className="relative flex items-center">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="hover:text-white transition-colors cursor-pointer"
+          className="hover:text-white transition-colors cursor-pointer flex items-center"
         >
-          ☆
+          <BsStars size={20} />
         </button>
         {menuOpen && (
-          <div className="absolute top-7 left-0 glass-strong py-1 min-w-[160px]">
-            <button
-              onClick={() => {
-                setScene('SPACE')
-                setMenuOpen(false)
-              }}
-              className="w-full text-left px-3 py-1.5 hover:bg-white/10 text-white/80 text-xs cursor-pointer"
-            >
-              {t('backToSpace')}
-            </button>
+          <div className="absolute top-7 left-3 py-1 min-w-[160px]"
+            style={{
+              background: 'rgba(30, 30, 30, 0.8)',
+              backdropFilter: 'blur(40px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '8px',
+            }}
+          >
+            <MenuItem onClick={() => setSoundEnabled(!soundEnabled)}>
+              {soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF'}
+            </MenuItem>
+            <MenuItem onClick={() => setLang(lang === 'ko' ? 'en' : 'ko')}>
+              🌐 {lang === 'ko' ? 'English' : '한국어'}
+            </MenuItem>
+            <div className="border-t border-white/10 my-1" />
+            <MenuItem onClick={() => { setScene('SPACE'); setMenuOpen(false) }}>
+              🚀 {t('backToSpace')}
+            </MenuItem>
           </div>
         )}
       </div>
 
-      {/* Right: Sound + Language */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          className="hover:text-white transition-colors cursor-pointer"
-        >
-          {soundEnabled ? '🔊' : '🔇'}
-        </button>
-        <button
-          onClick={() => setLang(lang === 'ko' ? 'en' : 'ko')}
-          className="hover:text-white transition-colors cursor-pointer"
-        >
-          {lang === 'ko' ? 'EN' : 'KR'}
-        </button>
-      </div>
+      {/* Right: Clock */}
+      <Clock />
     </div>
   )
 }
