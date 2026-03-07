@@ -7,6 +7,8 @@ interface StoreState {
   setScene: (scene: SceneState) => void
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
+  assetsReady: boolean
+  setAssetsReady: (ready: boolean) => void
   loadingProgress: number
   setLoadingProgress: (progress: number) => void
   soundEnabled: boolean
@@ -24,6 +26,8 @@ export const useStore = create<StoreState>((set) => ({
   setScene: (scene) => set({ scene }),
   isLoading: true,
   setIsLoading: (isLoading) => set({ isLoading }),
+  assetsReady: false,
+  setAssetsReady: (assetsReady) => set({ assetsReady }),
   loadingProgress: 0,
   setLoadingProgress: (loadingProgress) => set({ loadingProgress }),
   soundEnabled: true,

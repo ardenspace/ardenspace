@@ -4,15 +4,15 @@ import { useStore } from '../stores/useStore'
 
 export default function LoadingScreen() {
   const { progress, active } = useProgress()
-  const setIsLoading = useStore((s) => s.setIsLoading)
+  const setAssetsReady = useStore((s) => s.setAssetsReady)
   const setLoadingProgress = useStore((s) => s.setLoadingProgress)
 
   useEffect(() => {
     setLoadingProgress(progress)
     if (!active) {
-      setIsLoading(false)
+      setAssetsReady(true)
     }
-  }, [progress, active, setIsLoading, setLoadingProgress])
+  }, [progress, active, setAssetsReady, setLoadingProgress])
 
   return null
 }

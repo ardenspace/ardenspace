@@ -9,6 +9,12 @@ export default function InsideSphereScene() {
   const setScene = useStore((s) => s.setScene)
   const downRef = useRef<{ x: number; y: number; time: number } | null>(null)
   const gl = useThree((s) => s.gl)
+  const camera = useThree((s) => s.camera)
+
+  // Set initial camera position
+  useEffect(() => {
+    camera.position.set(0, 0.1, 2.85)
+  }, [camera])
 
   useEffect(() => {
     const dom = gl.domElement

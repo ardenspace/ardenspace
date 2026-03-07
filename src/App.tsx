@@ -4,6 +4,7 @@ import { Preload, Environment } from '@react-three/drei'
 import { useStore } from './stores/useStore'
 import { useAudio } from './hooks/useAudio'
 import LoadingScreen from './components/LoadingScreen'
+import LoadingOverlay from './components/LoadingOverlay'
 import SpaceScene from './scenes/SpaceScene'
 import CameraTransition from './scenes/CameraTransition'
 import InsideSphereScene from './scenes/InsideSphereScene'
@@ -13,7 +14,6 @@ const DesktopScreen = lazy(() => import('./desktop/DesktopScreen'))
 function App() {
   const scene = useStore((s) => s.scene)
   const isLoading = useStore((s) => s.isLoading)
-  const loadingProgress = useStore((s) => s.loadingProgress)
   useAudio()
 
   if (scene === 'PC_SCREEN') {
@@ -46,19 +46,7 @@ function App() {
       </Canvas>
 
       {/* Loading overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
-          <div className="text-center">
-            <div className="text-white/60 text-sm mb-3">Loading...</div>
-            <div className="w-48 h-1 bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-white/60 rounded-full transition-all duration-300"
-                style={{ width: `${loadingProgress}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {isLoading && <LoadingOverlay />}
 
     </>
   )

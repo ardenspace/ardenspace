@@ -23,7 +23,7 @@ export function useCameraTransition() {
 
     // Reset camera when returning to SPACE
     if (scene === 'SPACE') {
-      camera.position.set(0, 0, 30)
+      camera.position.set(0, 0, 25)
       camera.lookAt(0, 0, 0)
     }
   }, [scene, camera, setScene])
