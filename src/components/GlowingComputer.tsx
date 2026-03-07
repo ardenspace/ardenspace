@@ -173,22 +173,46 @@ const staticFragmentShader = `
   }
 `
 
+function isPlantNode(name: string) {
+  return (
+    name.startsWith('leafplanes_') ||
+    name.startsWith('Grass') ||
+    name.startsWith('DIvy_') ||
+    name.startsWith('Vine') ||
+    name.startsWith('Ivy') ||
+    name.startsWith('SnailIvy') ||
+    name.startsWith('DevilsIvy') ||
+    name.startsWith('PinkTree') ||
+    name.startsWith('Treesmall') ||
+    name.startsWith('Treemedium') ||
+    name.startsWith('Chinese_Trumpet') ||
+    name.includes('leaf') ||
+    name.includes('Monstera')
+  )
+}
+
 export default function GlowingComputer() {
   const { scene } = useGLTF('/ardensgarden.glb')
   const setScene = useStore((s) => s.setScene)
   const materialsRef = useRef<THREE.ShaderMaterial[]>([])
+  const plantNodesRef = useRef<{ node: THREE.Object3D; seed: number; origX: number; origZ: number }[]>([])
 
   const staticUniforms = useMemo(() => ({
     uTime: { value: 0 },
   }), [])
 
-  // Hide glass sphere + apply static shader to non-center screens
+  // Hide glass sphere + apply static shader to non-center screens + collect plant nodes
   useEffect(() => {
     const origMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>()
+    const plants: { node: THREE.Object3D; seed: number; origX: number; origZ: number }[] = []
 
     scene.traverse((child) => {
       if (child.name === 'GlassSphere' || child.name === 'Sphere.052') {
         child.visible = false
+      }
+
+      if (isPlantNode(child.name)) {
+        plants.push({ node: child, seed: Math.random() * Math.PI * 2, origX: child.rotation.x, origZ: child.rotation.z })
       }
 
       // Aurora shader on center screen
@@ -227,24 +251,30 @@ export default function GlowingComputer() {
       }
     })
 
+    plantNodesRef.current = plants
+
     return () => {
       scene.traverse((child) => {
         if (child.name === 'GlassSphere' || child.name === 'Sphere.052') {
           child.visible = true
         }
       })
-      // Restore original materials
       origMaterials.forEach((mat, mesh) => {
         mesh.material = mat
       })
       materialsRef.current.forEach((m) => m.dispose())
       materialsRef.current = []
+      plantNodesRef.current = []
     }
   }, [scene, staticUniforms])
 
-  // Animate the noise
   useFrame((_state, delta) => {
     staticUniforms.uTime.value += delta
+    const t = staticUniforms.uTime.value
+    for (const { node, seed, origX, origZ } of plantNodesRef.current) {
+      node.rotation.z = origZ + Math.sin(t * 0.8 + seed) * 0.015
+      node.rotation.x = origX + Math.sin(t * 0.6 + seed + 1.0) * 0.01
+    }
   })
 
   const handleClick = (e: { object: THREE.Object3D; stopPropagation: () => void }) => {
