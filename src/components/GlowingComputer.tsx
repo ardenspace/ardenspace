@@ -184,7 +184,6 @@ function isPlantNode(name: string) {
     name.startsWith('DevilsIvy') ||
     name.startsWith('PinkTree') ||
     name.startsWith('Treesmall') ||
-    name.startsWith('Treemedium') ||
     name.startsWith('Chinese_Trumpet') ||
     name.includes('leaf') ||
     name.includes('Monstera')
