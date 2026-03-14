@@ -12,7 +12,7 @@ export default function ResumeApp() {
   const Content = lang === 'ko' ? ResumeKo : ResumeEn
 
   return (
-    <AppWindow title={t('resume')}>
+    <AppWindow appId="resume" title={t('resume')}>
       <Suspense fallback={<div className="text-white/40">Loading...</div>}>
         <Content />
       </Suspense>

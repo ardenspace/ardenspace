@@ -21,7 +21,7 @@ export default function BlogApp() {
   if (blogPost && blogComponents[blogPost]) {
     const Content = blogComponents[blogPost][lang]
     return (
-      <AppWindow title={t('blog')}>
+      <AppWindow appId="blog" title={t('blog')}>
         <button
           onClick={() => setBlogPost(null)}
           className="text-white/50 hover:text-white text-sm mb-4 cursor-pointer"
@@ -37,7 +37,7 @@ export default function BlogApp() {
 
   // List view
   return (
-    <AppWindow title={t('blog')}>
+    <AppWindow appId="blog" title={t('blog')}>
       <div className="space-y-4">
         {blogPosts.map((post) => (
           <button

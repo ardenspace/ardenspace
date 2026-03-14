@@ -15,8 +15,14 @@ interface StoreState {
   setSoundEnabled: (enabled: boolean) => void
   lang: 'ko' | 'en'
   setLang: (lang: 'ko' | 'en') => void
-  activeApp: string | null
-  setActiveApp: (app: string | null) => void
+  openApps: string[]
+  minimizedApps: string[]
+  focusedApp: string | null
+  openApp: (app: string) => void
+  closeApp: (app: string) => void
+  focusApp: (app: string) => void
+  minimizeApp: (app: string) => void
+  restoreApp: (app: string) => void
   blogPost: string | null
   setBlogPost: (slug: string | null) => void
 }
@@ -32,10 +38,34 @@ export const useStore = create<StoreState>((set) => ({
   setLoadingProgress: (loadingProgress) => set({ loadingProgress }),
   soundEnabled: true,
   setSoundEnabled: (soundEnabled) => set({ soundEnabled }),
-  lang: 'ko',
+  lang: 'en',
   setLang: (lang) => set({ lang }),
-  activeApp: null,
-  setActiveApp: (activeApp) => set({ activeApp }),
+  openApps: [],
+  minimizedApps: [],
+  focusedApp: null,
+  openApp: (app) => set((s) => ({
+    openApps: s.openApps.includes(app) ? s.openApps : [...s.openApps, app],
+    minimizedApps: s.minimizedApps.filter((a) => a !== app),
+    focusedApp: app,
+  })),
+  closeApp: (app) => set((s) => ({
+    openApps: s.openApps.filter((a) => a !== app),
+    minimizedApps: s.minimizedApps.filter((a) => a !== app),
+    focusedApp: s.focusedApp === app ? (s.openApps.filter((a) => a !== app).at(-1) ?? null) : s.focusedApp,
+  })),
+  focusApp: (app) => set((s) => ({
+    openApps: [...s.openApps.filter((a) => a !== app), app],
+    focusedApp: app,
+  })),
+  minimizeApp: (app) => set((s) => ({
+    minimizedApps: [...s.minimizedApps, app],
+    focusedApp: s.focusedApp === app ? (s.openApps.filter((a) => a !== app && !s.minimizedApps.includes(a)).at(-1) ?? null) : s.focusedApp,
+  })),
+  restoreApp: (app) => set((s) => ({
+    minimizedApps: s.minimizedApps.filter((a) => a !== app),
+    openApps: [...s.openApps.filter((a) => a !== app), app],
+    focusedApp: app,
+  })),
   blogPost: null,
   setBlogPost: (blogPost) => set({ blogPost }),
 }))

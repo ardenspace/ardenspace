@@ -1,32 +1,250 @@
-import type { ReactNode } from 'react'
-import { useStore } from '../stores/useStore'
+import { type ReactNode, useState, useRef, useCallback } from "react";
+import { useStore } from "../stores/useStore";
+import { GoPlus } from "react-icons/go";
+import { FiMinus } from "react-icons/fi";
+import { RxSize } from "react-icons/rx";
 
 interface AppWindowProps {
-  title: string
-  children: ReactNode
+  appId: string;
+  title: string;
+  children: ReactNode;
 }
 
-export default function AppWindow({ title, children }: AppWindowProps) {
-  const setActiveApp = useStore((s) => s.setActiveApp)
+type ResizeDir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw" | null;
+
+const MIN_W = 400;
+const MIN_H = 300;
+
+export default function AppWindow({ appId, title, children }: AppWindowProps) {
+  const closeApp = useStore((s) => s.closeApp);
+  const minimizeApp = useStore((s) => s.minimizeApp);
+  const isMinimizedInStore = useStore((s) => s.minimizedApps.includes(appId));
+  const [position, setPosition] = useState(() => {
+    // Seeded random per appId for consistent but scattered positions
+    let hash = 0;
+    for (let i = 0; i < appId.length; i++) {
+      hash = ((hash << 5) - hash + appId.charCodeAt(i)) | 0;
+    }
+    const rand = (seed: number) => (Math.abs(seed) % 1000) / 1000;
+    const x = (rand(hash) - 0.5) * 800;
+    const y = (rand(hash * 7 + 13) - 0.5) * 200;
+    return { x, y };
+  });
+  const [size, setSize] = useState<{ w: number; h: number } | null>({
+    w: 550,
+    h: 450,
+  });
+  const [isMaximized, setIsMaximized] = useState(false);
+  const dragging = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0 });
+
+  const onDragStart = useCallback(
+    (e: React.MouseEvent) => {
+      if (isMaximized) return;
+      dragging.current = true;
+      dragStart.current = {
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      };
+
+      const onMouseMove = (e: MouseEvent) => {
+        if (!dragging.current) return;
+        setPosition({
+          x: e.clientX - dragStart.current.x,
+          y: e.clientY - dragStart.current.y,
+        });
+      };
+
+      const onMouseUp = () => {
+        dragging.current = false;
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      };
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [position, isMaximized],
+  );
+
+  const onResizeStart = useCallback(
+    (e: React.MouseEvent, dir: ResizeDir) => {
+      if (isMaximized || !dir) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startPos = { ...position };
+      const windowEl = (e.target as HTMLElement).closest(
+        "[data-window]",
+      ) as HTMLElement | null;
+      const startW = size?.w ?? (windowEl?.offsetWidth || 600);
+      const startH = size?.h ?? (windowEl?.offsetHeight || 500);
+
+      const onMouseMove = (e: MouseEvent) => {
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        let newW = startW;
+        let newH = startH;
+        let newX = startPos.x;
+        let newY = startPos.y;
+
+        if (dir.includes("e")) newW = Math.max(MIN_W, startW + dx);
+        if (dir.includes("w")) {
+          newW = Math.max(MIN_W, startW - dx);
+          newX = startPos.x + (startW - newW);
+        }
+        if (dir.includes("s")) newH = Math.max(MIN_H, startH + dy);
+        if (dir.includes("n")) {
+          newH = Math.max(MIN_H, startH - dy);
+          newY = startPos.y + (startH - newH);
+        }
+
+        setSize({ w: newW, h: newH });
+        setPosition({ x: newX, y: newY });
+      };
+
+      const onMouseUp = () => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      };
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [position, size, isMaximized],
+  );
+
+  const cursorMap: Record<string, string> = {
+    n: "cursor-ns-resize",
+    s: "cursor-ns-resize",
+    e: "cursor-ew-resize",
+    w: "cursor-ew-resize",
+    ne: "cursor-nesw-resize",
+    sw: "cursor-nesw-resize",
+    nw: "cursor-nwse-resize",
+    se: "cursor-nwse-resize",
+  };
+
+  const edges: { dir: ResizeDir; className: string }[] = [
+    {
+      dir: "n",
+      className: `absolute -top-1 left-2 right-2 h-2 ${cursorMap.n}`,
+    },
+    {
+      dir: "s",
+      className: `absolute -bottom-1 left-2 right-2 h-2 ${cursorMap.s}`,
+    },
+    {
+      dir: "e",
+      className: `absolute top-2 -right-1 bottom-2 w-2 ${cursorMap.e}`,
+    },
+    {
+      dir: "w",
+      className: `absolute top-2 -left-1 bottom-2 w-2 ${cursorMap.w}`,
+    },
+    { dir: "nw", className: `absolute -top-1 -left-1 w-3 h-3 ${cursorMap.nw}` },
+    {
+      dir: "ne",
+      className: `absolute -top-1 -right-1 w-3 h-3 ${cursorMap.ne}`,
+    },
+    {
+      dir: "sw",
+      className: `absolute -bottom-1 -left-1 w-3 h-3 ${cursorMap.sw}`,
+    },
+    {
+      dir: "se",
+      className: `absolute -bottom-1 -right-1 w-3 h-3 ${cursorMap.se}`,
+    },
+  ];
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-30 p-12 pb-20 pt-10">
-      <div className="glass-strong w-full max-w-2xl h-full flex flex-col overflow-hidden">
-        {/* Title bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
-          <button
-            onClick={() => setActiveApp(null)}
-            className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors cursor-pointer"
-          />
-          <span className="w-3 h-3 rounded-full bg-yellow-500/30" />
-          <span className="w-3 h-3 rounded-full bg-green-500/30" />
+    <div
+      className={`absolute z-30 ${isMaximized ? "inset-0 pt-8 p-0" : "inset-0 flex items-center justify-center p-12 pb-20 pt-10"}`}
+      style={{
+        ...(!isMaximized ? { pointerEvents: "none" as const } : {}),
+        ...(isMinimizedInStore ? { pointerEvents: "none" as const } : {}),
+      }}
+    >
+      <div
+        data-window
+        className={`glass-frosted flex flex-col overflow-hidden relative transition-all duration-300 ease-in-out ${isMaximized ? "w-full h-full !rounded-none" : ""}`}
+        style={{
+          ...(!isMaximized
+            ? {
+                transform: isMinimizedInStore
+                  ? `translate(${position.x}px, 100vh) scale(0.5)`
+                  : `translate(${position.x}px, ${position.y}px)`,
+                pointerEvents: isMinimizedInStore ? "none" : "auto",
+                opacity: isMinimizedInStore ? 0 : 1,
+                ...(size
+                  ? { width: size.w, height: size.h }
+                  : { width: "100%", maxWidth: "42rem", height: "100%" }),
+              }
+            : {
+                ...(isMinimizedInStore ? { transform: "translateY(100vh) scale(0.5)", opacity: 0 } : {}),
+              }),
+        }}
+      >
+        {/* Resize handles */}
+        {!isMaximized &&
+          edges.map(({ dir, className }) => (
+            <div
+              key={dir}
+              className={className}
+              onMouseDown={(e) => onResizeStart(e, dir)}
+              style={{ zIndex: 50 }}
+            />
+          ))}
+
+        {/* Title bar - draggable */}
+        <div
+          className="flex items-center gap-2 px-4 py-3 border-b border-white/10 cursor-grab active:cursor-grabbing select-none"
+          onMouseDown={onDragStart}
+        >
+          {/* Traffic lights with hover icons */}
+          <div className="flex items-center gap-2.5 group/traffic">
+            <button
+              onClick={() => closeApp(appId)}
+              onMouseDown={(e) => e.stopPropagation()}
+              className="w-3.5 h-3.5 rounded-full bg-[#ff5f57] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
+            >
+              <GoPlus
+                className="hidden group-hover/traffic:block text-black rotate-45"
+                size={12}
+              />
+            </button>
+            <button
+              onClick={() => minimizeApp(appId)}
+              onMouseDown={(e) => e.stopPropagation()}
+              className="w-3.5 h-3.5 rounded-full bg-[#febc2e] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
+            >
+              <FiMinus
+                className="hidden group-hover/traffic:block text-black"
+                size={10}
+              />
+            </button>
+            <button
+              onClick={() => {
+                setIsMaximized(!isMaximized);
+                setPosition({ x: 0, y: 0 });
+                setSize(null);
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              className="w-3.5 h-3.5 rounded-full bg-[#28c840] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
+            >
+              <RxSize
+                className="hidden group-hover/traffic:block text-black"
+                size={8}
+              />
+            </button>
+          </div>
           <span className="ml-2 text-white/60 text-xs">{title}</span>
         </div>
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 mdx-content">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto p-6 mdx-content">{children}</div>
       </div>
     </div>
-  )
+  );
 }

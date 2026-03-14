@@ -2,20 +2,41 @@ import { useStore } from '../stores/useStore'
 import AboutApp from './apps/AboutApp'
 import ResumeApp from './apps/ResumeApp'
 import BlogApp from './apps/BlogApp'
+import ExperienceApp from './apps/ExperienceApp'
+import ProjectsApp from './apps/ProjectsApp'
+import ContactApp from './apps/ContactApp'
+import GuestBookApp from './apps/GuestBookApp'
+
+const appComponents: Record<string, () => JSX.Element> = {
+  aboutme: AboutApp,
+  experience: ExperienceApp,
+  projects: ProjectsApp,
+  blog: BlogApp,
+  contact: ContactApp,
+  'guest-book': GuestBookApp,
+  resume: ResumeApp,
+}
 
 export default function WindowManager() {
-  const activeApp = useStore((s) => s.activeApp)
+  const openApps = useStore((s) => s.openApps)
+  const focusedApp = useStore((s) => s.focusedApp)
+  const focusApp = useStore((s) => s.focusApp)
 
-  if (!activeApp) return null
-
-  switch (activeApp) {
-    case 'about':
-      return <AboutApp />
-    case 'resume':
-      return <ResumeApp />
-    case 'blog':
-      return <BlogApp />
-    default:
-      return null
-  }
+  return (
+    <>
+      {openApps.map((appId, i) => {
+        const Component = appComponents[appId]
+        if (!Component) return null
+        return (
+          <div
+            key={appId}
+            style={{ zIndex: 30 + i }}
+            onMouseDown={() => focusApp(appId)}
+          >
+            <Component />
+          </div>
+        )
+      })}
+    </>
+  )
 }

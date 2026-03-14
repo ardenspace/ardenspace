@@ -12,7 +12,7 @@ export default function AboutApp() {
   const Content = lang === 'ko' ? AboutKo : AboutEn
 
   return (
-    <AppWindow title={t('about')}>
+    <AppWindow appId="aboutme" title={t('about')}>
       <Suspense fallback={<div className="text-white/40">Loading...</div>}>
         <Content />
       </Suspense>
