@@ -4,22 +4,22 @@ import { useStore } from '../stores/useStore'
 export function useAudio() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const soundEnabled = useStore((s) => s.soundEnabled)
-  const scene = useStore((s) => s.scene)
+  const isLoading = useStore((s) => s.isLoading)
 
   useEffect(() => {
     if (!audioRef.current) {
-      audioRef.current = new Audio('/wind.mp3')
+      audioRef.current = new Audio('/sound/audio.wav')
       audioRef.current.loop = true
       audioRef.current.volume = 0.3
     }
   }, [])
 
-  // Start playing on first scene transition (user interaction)
+  // Start playing when landing page is reached (loading complete)
   useEffect(() => {
-    if (scene === 'ENTERING_SPHERE' && audioRef.current) {
+    if (!isLoading && audioRef.current) {
       audioRef.current.play().catch(() => {})
     }
-  }, [scene])
+  }, [isLoading])
 
   useEffect(() => {
     if (audioRef.current) {
