@@ -37,6 +37,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
     h: 450,
   });
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
   const dragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
 
@@ -44,6 +45,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
     (e: React.MouseEvent) => {
       if (isMaximized) return;
       dragging.current = true;
+      setIsInteracting(true);
       dragStart.current = {
         x: e.clientX - position.x,
         y: e.clientY - position.y,
@@ -59,6 +61,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
 
       const onMouseUp = () => {
         dragging.current = false;
+        setIsInteracting(false);
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
       };
@@ -74,6 +77,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
       if (isMaximized || !dir) return;
       e.preventDefault();
       e.stopPropagation();
+      setIsInteracting(true);
 
       const startX = e.clientX;
       const startY = e.clientY;
@@ -108,6 +112,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
       };
 
       const onMouseUp = () => {
+        setIsInteracting(false);
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
       };
@@ -165,17 +170,21 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
     <div
       className={`absolute z-30 ${isMobile ? "inset-0 top-9" : isMaximized ? "inset-0 pt-8 p-0" : "inset-0 flex items-center justify-center p-12 pb-20 pt-10"}`}
       style={{
-        ...(!isMobile && !isMaximized ? { pointerEvents: "none" as const } : {}),
+        ...(!isMobile && !isMaximized
+          ? { pointerEvents: "none" as const }
+          : {}),
         ...(isMinimizedInStore ? { pointerEvents: "none" as const } : {}),
       }}
     >
       <div
         data-window
-        className={`glass-frosted flex flex-col overflow-hidden relative transition-all duration-300 ease-in-out ${isMobile ? "w-full h-full !rounded-none" : isMaximized ? "w-full h-full !rounded-none" : ""}`}
+        className={`glass-frosted flex flex-col overflow-hidden relative ${isInteracting ? "" : "transition-all duration-300 ease-in-out"} ${isMobile ? "w-full h-full !rounded-none" : isMaximized ? "w-full h-full !rounded-none" : ""}`}
         style={{
           ...(isMobile
             ? {
-                ...(isMinimizedInStore ? { transform: "translateY(100vh) scale(0.5)", opacity: 0 } : {}),
+                ...(isMinimizedInStore
+                  ? { transform: "translateY(100vh) scale(0.5)", opacity: 0 }
+                  : {}),
               }
             : !isMaximized
               ? {
@@ -189,12 +198,15 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
                     : { width: "100%", maxWidth: "42rem", height: "100%" }),
                 }
               : {
-                  ...(isMinimizedInStore ? { transform: "translateY(100vh) scale(0.5)", opacity: 0 } : {}),
+                  ...(isMinimizedInStore
+                    ? { transform: "translateY(100vh) scale(0.5)", opacity: 0 }
+                    : {}),
                 }),
         }}
       >
         {/* Resize handles */}
-        {!isMobile && !isMaximized &&
+        {!isMobile &&
+          !isMaximized &&
           edges.map(({ dir, className }) => (
             <div
               key={dir}
@@ -214,7 +226,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
             <button
               onClick={() => closeApp(appId)}
               onMouseDown={(e) => e.stopPropagation()}
-              className="w-3.5 h-3.5 rounded-full bg-[#ff5f57] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
+              className="w-3 h-3 rounded-full bg-[#ff5f57] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
             >
               <GoPlus
                 className="hidden group-hover/traffic:block text-black rotate-45"
@@ -225,7 +237,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
               <button
                 onClick={() => minimizeApp(appId)}
                 onMouseDown={(e) => e.stopPropagation()}
-                className="w-3.5 h-3.5 rounded-full bg-[#febc2e] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
+                className="w-3 h-3 rounded-full bg-[#febc2e] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
               >
                 <FiMinus
                   className="hidden group-hover/traffic:block text-black"
@@ -241,7 +253,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
                   setSize(null);
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
-                className="w-3.5 h-3.5 rounded-full bg-[#28c840] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
+                className="w-3 h-3 rounded-full bg-[#28c840] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
               >
                 <RxSize
                   className="hidden group-hover/traffic:block text-black"

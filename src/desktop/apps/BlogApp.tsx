@@ -2,12 +2,12 @@ import { Suspense, lazy } from 'react'
 import { useStore } from '../../stores/useStore'
 import AppWindow from '../AppWindow'
 import { useT } from '../../i18n'
-import { blogPosts } from '../../content/blog'
+import { blogPosts } from '../../content/index'
 
 const blogComponents: Record<string, Record<string, React.LazyExoticComponent<React.ComponentType>>> = {
   'post-1': {
-    ko: lazy(() => import('../../content/blog/post-1.ko.mdx')),
-    en: lazy(() => import('../../content/blog/post-1.en.mdx')),
+    ko: lazy(() => import('../../content/ko/blog/post-1.mdx')),
+    en: lazy(() => import('../../content/en/blog/post-1.mdx')),
   },
 }
 

@@ -3,8 +3,8 @@ import { useStore } from '../../stores/useStore'
 import AppWindow from '../AppWindow'
 import { useT } from '../../i18n'
 
-const AboutKo = lazy(() => import('../../content/about.ko.mdx'))
-const AboutEn = lazy(() => import('../../content/about.en.mdx'))
+const AboutKo = lazy(() => import('../../content/ko/about.mdx'))
+const AboutEn = lazy(() => import('../../content/en/about.mdx'))
 
 export default function AboutApp() {
   const lang = useStore((s) => s.lang)

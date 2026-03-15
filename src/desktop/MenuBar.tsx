@@ -74,7 +74,7 @@ export default function MenuBar() {
   }, [menuOpen]);
 
   return (
-    <div className="absolute top-2 left-1 right-1 sm:left-2 sm:right-3 h-7 flex items-center justify-between px-2 sm:px-4 text-white/80 text-xs z-50">
+    <div className="absolute left-1 right-1 sm:left-2 sm:right-3 h-10 flex items-center justify-between px-2 sm:px-4 text-white/80 text-xs z-50">
       {/* Left: Icon + menu */}
       <div ref={menuRef} className="relative flex items-center">
         <button

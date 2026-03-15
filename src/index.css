@@ -13,6 +13,7 @@ body,
   height: 100%;
   overflow: hidden;
   background: #000;
+  font-family: 'Datatype', 'IBM Plex Sans KR', sans-serif;
 }
 
 .glass {
@@ -119,6 +120,7 @@ body,
 .mdx-content li {
   margin-bottom: 0.25rem;
   line-height: 1.6;
+  list-style-type: "·  ";
 }
 
 .mdx-content code {
