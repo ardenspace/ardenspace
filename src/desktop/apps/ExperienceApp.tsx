@@ -12,7 +12,7 @@ export default function ExperienceApp() {
   const Content = lang === 'ko' ? ExperienceKo : ExperienceEn
 
   return (
-    <AppWindow appId="experience" title={t('experience')}>
+    <AppWindow appId="work-experience" title={t('experience')}>
       <Suspense fallback={<div className="text-white/40">Loading...</div>}>
         <Content />
       </Suspense>
