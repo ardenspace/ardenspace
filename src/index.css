@@ -13,7 +13,7 @@ body,
   height: 100%;
   overflow: hidden;
   background: #000;
-  font-family: 'Datatype', 'IBM Plex Sans KR', sans-serif;
+  font-family: "Datatype", "IBM Plex Sans KR", sans-serif;
 }
 
 .glass {
@@ -96,12 +96,36 @@ body,
   color: rgba(255, 255, 255, 0.9);
 }
 
+.mdx-content .experience-hero {
+  text-align: center;
+}
+
+.mdx-content .experience-hero h2 {
+  margin-top: 0;
+}
+
+.mdx-content .experience-meta {
+  margin-top: -0.7rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .mdx-content h3 {
   font-size: 1.1rem;
   font-weight: 600;
   margin-top: 1.25rem;
   margin-bottom: 0.5rem;
   color: rgba(255, 255, 255, 0.85);
+}
+
+.mdx-content h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .mdx-content p {

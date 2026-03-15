@@ -16,6 +16,15 @@ type ResizeDir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw" | null;
 const MIN_W = 400;
 const MIN_H = 300;
 
+function getDockTop() {
+  const dock = document.querySelector("[data-dock]") as HTMLElement | null;
+  return dock?.getBoundingClientRect().top ?? window.innerHeight - 80;
+}
+
+function getDockInset() {
+  return window.innerHeight - getDockTop();
+}
+
 export default function AppWindow({ appId, title, children }: AppWindowProps) {
   const closeApp = useStore((s) => s.closeApp);
   const minimizeApp = useStore((s) => s.minimizeApp);
@@ -53,10 +62,24 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
 
       const onMouseMove = (e: MouseEvent) => {
         if (!dragging.current) return;
-        setPosition({
-          x: e.clientX - dragStart.current.x,
-          y: e.clientY - dragStart.current.y,
-        });
+        const newX = e.clientX - dragStart.current.x;
+        let newY = e.clientY - dragStart.current.y;
+        // 창 상단이 메뉴바 아래에 머물도록 제한
+        const curH = size?.h ?? 450;
+        const containerPadTop = 40;
+        const dockTop = getDockTop();
+        const containerPadBot = window.innerHeight - dockTop;
+        const availH = window.innerHeight - containerPadTop - containerPadBot;
+        const centerY = containerPadTop + availH / 2;
+        const windowTop = centerY + newY - curH / 2;
+        if (windowTop < 40) {
+          newY += 40 - windowTop;
+        }
+        const windowBottom = centerY + newY + curH / 2;
+        if (windowBottom > dockTop) {
+          newY -= windowBottom - dockTop;
+        }
+        setPosition({ x: newX, y: newY });
       };
 
       const onMouseUp = () => {
@@ -69,7 +92,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [position, isMaximized],
+    [position, size, isMaximized],
   );
 
   const onResizeStart = useCallback(
@@ -87,25 +110,61 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
       ) as HTMLElement | null;
       const startW = size?.w ?? (windowEl?.offsetWidth || 600);
       const startH = size?.h ?? (windowEl?.offsetHeight || 500);
+      const containerPadTop = 40;
+      const dockTop = getDockTop();
+      const containerPadBot = window.innerHeight - dockTop;
+      const menuBarBottom = 40;
+      const centerX = window.innerWidth / 2;
+      const availH = window.innerHeight - containerPadTop - containerPadBot;
+      const centerY = containerPadTop + availH / 2;
+      const minLeft = 0;
+      const maxRight = window.innerWidth;
+      const maxBottom = dockTop;
+      const startLeft = centerX + startPos.x - startW / 2;
+      const startRight = centerX + startPos.x + startW / 2;
+      const startTop = centerY + startPos.y - startH / 2;
+      const startBottom = centerY + startPos.y + startH / 2;
 
       const onMouseMove = (e: MouseEvent) => {
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
-        let newW = startW;
-        let newH = startH;
-        let newX = startPos.x;
-        let newY = startPos.y;
+        let newLeft = startLeft;
+        let newRight = startRight;
+        let newTop = startTop;
+        let newBottom = startBottom;
 
-        if (dir.includes("e")) newW = Math.max(MIN_W, startW + dx);
+        if (dir.includes("e")) {
+          newRight = Math.min(
+            maxRight,
+            Math.max(startLeft + MIN_W, startRight + dx),
+          );
+        }
+
         if (dir.includes("w")) {
-          newW = Math.max(MIN_W, startW - dx);
-          newX = startPos.x + (startW - newW);
+          newLeft = Math.max(
+            minLeft,
+            Math.min(startRight - MIN_W, startLeft + dx),
+          );
         }
-        if (dir.includes("s")) newH = Math.max(MIN_H, startH + dy);
+
+        if (dir.includes("s")) {
+          newBottom = Math.min(
+            maxBottom,
+            Math.max(startTop + MIN_H, startBottom + dy),
+          );
+        }
+
         if (dir.includes("n")) {
-          newH = Math.max(MIN_H, startH - dy);
-          newY = startPos.y + (startH - newH);
+          newTop = Math.max(
+            menuBarBottom,
+            Math.min(startBottom - MIN_H, startTop + dy),
+          );
         }
+
+        const newW = newRight - newLeft;
+        const newH = newBottom - newTop;
+        const newX = (newLeft + newRight) / 2 - centerX;
+        const newY = (newTop + newBottom) / 2 - centerY;
 
         setSize({ w: newW, h: newH });
         setPosition({ x: newX, y: newY });
@@ -168,10 +227,13 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
 
   return (
     <div
-      className={`absolute z-30 ${isMobile ? "inset-0 top-9" : isMaximized ? "inset-0 pt-8 p-0" : "inset-0 flex items-center justify-center p-12 pb-20 pt-10"}`}
+      className={`absolute z-30 ${isMobile ? "inset-0 top-9" : isMaximized ? "inset-0 pt-8 p-0" : "inset-0 flex items-center justify-center pt-10"}`}
       style={{
         ...(!isMobile && !isMaximized
-          ? { pointerEvents: "none" as const }
+          ? {
+              pointerEvents: "none" as const,
+              paddingBottom: getDockInset(),
+            }
           : {}),
         ...(isMinimizedInStore ? { pointerEvents: "none" as const } : {}),
       }}

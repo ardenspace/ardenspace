@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useStore } from '../stores/useStore'
 import AboutApp from './apps/AboutApp'
 import ResumeApp from './apps/ResumeApp'
@@ -7,9 +8,9 @@ import ProjectsApp from './apps/ProjectsApp'
 import ContactApp from './apps/ContactApp'
 import GuestBookApp from './apps/GuestBookApp'
 
-const appComponents: Record<string, () => JSX.Element> = {
+const appComponents: Record<string, () => ReactNode> = {
   aboutme: AboutApp,
-  experience: ExperienceApp,
+  'work-experience': ExperienceApp,
   projects: ProjectsApp,
   blog: BlogApp,
   contact: ContactApp,
@@ -19,7 +20,6 @@ const appComponents: Record<string, () => JSX.Element> = {
 
 export default function WindowManager() {
   const openApps = useStore((s) => s.openApps)
-  const focusedApp = useStore((s) => s.focusedApp)
   const focusApp = useStore((s) => s.focusApp)
 
   return (

@@ -23,9 +23,9 @@ const dockItems: {
     type: "app",
   },
   {
-    id: "experience",
+    id: "work-experience",
     icon: <MdOutlineWorkHistory size={27} />,
-    label: "Experience",
+    label: "Work Experience",
     type: "app",
   },
   {
@@ -70,7 +70,10 @@ export default function Dock() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <div className="absolute bottom-2 md:bottom-3 left-1/2 -translate-x-1/2 z-40 max-w-[98vw]">
+    <div
+      data-dock
+      className="absolute bottom-2 md:bottom-3 left-1/2 -translate-x-1/2 z-40 max-w-[98vw]"
+    >
       <div className="glass-frosted flex items-center justify-center py-2 px-2 md:py-3 md:px-3">
         <div className="flex items-center gap-2 md:gap-4 px-1 md:px-2">
           {dockItems.map((item) => {
@@ -78,7 +81,7 @@ export default function Dock() {
             return (
               <div
                 key={item.id}
-                className="relative flex flex-col items-center"
+                className="relative flex items-center justify-center"
               >
                 {/* Tooltip */}
                 {hoveredId === item.id && (
@@ -108,7 +111,7 @@ export default function Dock() {
                 </button>
                 {/* Open indicator dot */}
                 {isOpen && (
-                  <div className="w-1 h-1 rounded-full bg-white/80 mt-1.5" />
+                  <div className="absolute -bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-white/80" />
                 )}
               </div>
             );
