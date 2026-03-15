@@ -3,6 +3,7 @@ import { useStore } from "../stores/useStore";
 import { GoPlus } from "react-icons/go";
 import { FiMinus } from "react-icons/fi";
 import { RxSize } from "react-icons/rx";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 interface AppWindowProps {
   appId: string;
@@ -19,6 +20,7 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
   const closeApp = useStore((s) => s.closeApp);
   const minimizeApp = useStore((s) => s.minimizeApp);
   const isMinimizedInStore = useStore((s) => s.minimizedApps.includes(appId));
+  const isMobile = useIsMobile();
   const [position, setPosition] = useState(() => {
     // Seeded random per appId for consistent but scattered positions
     let hash = 0;
@@ -161,34 +163,38 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
 
   return (
     <div
-      className={`absolute z-30 ${isMaximized ? "inset-0 pt-8 p-0" : "inset-0 flex items-center justify-center p-12 pb-20 pt-10"}`}
+      className={`absolute z-30 ${isMobile ? "inset-0 top-9" : isMaximized ? "inset-0 pt-8 p-0" : "inset-0 flex items-center justify-center p-12 pb-20 pt-10"}`}
       style={{
-        ...(!isMaximized ? { pointerEvents: "none" as const } : {}),
+        ...(!isMobile && !isMaximized ? { pointerEvents: "none" as const } : {}),
         ...(isMinimizedInStore ? { pointerEvents: "none" as const } : {}),
       }}
     >
       <div
         data-window
-        className={`glass-frosted flex flex-col overflow-hidden relative transition-all duration-300 ease-in-out ${isMaximized ? "w-full h-full !rounded-none" : ""}`}
+        className={`glass-frosted flex flex-col overflow-hidden relative transition-all duration-300 ease-in-out ${isMobile ? "w-full h-full !rounded-none" : isMaximized ? "w-full h-full !rounded-none" : ""}`}
         style={{
-          ...(!isMaximized
+          ...(isMobile
             ? {
-                transform: isMinimizedInStore
-                  ? `translate(${position.x}px, 100vh) scale(0.5)`
-                  : `translate(${position.x}px, ${position.y}px)`,
-                pointerEvents: isMinimizedInStore ? "none" : "auto",
-                opacity: isMinimizedInStore ? 0 : 1,
-                ...(size
-                  ? { width: size.w, height: size.h }
-                  : { width: "100%", maxWidth: "42rem", height: "100%" }),
-              }
-            : {
                 ...(isMinimizedInStore ? { transform: "translateY(100vh) scale(0.5)", opacity: 0 } : {}),
-              }),
+              }
+            : !isMaximized
+              ? {
+                  transform: isMinimizedInStore
+                    ? `translate(${position.x}px, 100vh) scale(0.5)`
+                    : `translate(${position.x}px, ${position.y}px)`,
+                  pointerEvents: isMinimizedInStore ? "none" : "auto",
+                  opacity: isMinimizedInStore ? 0 : 1,
+                  ...(size
+                    ? { width: size.w, height: size.h }
+                    : { width: "100%", maxWidth: "42rem", height: "100%" }),
+                }
+              : {
+                  ...(isMinimizedInStore ? { transform: "translateY(100vh) scale(0.5)", opacity: 0 } : {}),
+                }),
         }}
       >
         {/* Resize handles */}
-        {!isMaximized &&
+        {!isMobile && !isMaximized &&
           edges.map(({ dir, className }) => (
             <div
               key={dir}
@@ -200,8 +206,8 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
 
         {/* Title bar - draggable */}
         <div
-          className="flex items-center gap-2 px-4 py-3 border-b border-white/10 cursor-grab active:cursor-grabbing select-none"
-          onMouseDown={onDragStart}
+          className={`flex items-center gap-2 px-4 py-3 border-b border-white/10 select-none ${isMobile ? "" : "cursor-grab active:cursor-grabbing"}`}
+          onMouseDown={isMobile ? undefined : onDragStart}
         >
           {/* Traffic lights with hover icons */}
           <div className="flex items-center gap-2.5 group/traffic">
@@ -215,30 +221,34 @@ export default function AppWindow({ appId, title, children }: AppWindowProps) {
                 size={12}
               />
             </button>
-            <button
-              onClick={() => minimizeApp(appId)}
-              onMouseDown={(e) => e.stopPropagation()}
-              className="w-3.5 h-3.5 rounded-full bg-[#febc2e] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
-            >
-              <FiMinus
-                className="hidden group-hover/traffic:block text-black"
-                size={10}
-              />
-            </button>
-            <button
-              onClick={() => {
-                setIsMaximized(!isMaximized);
-                setPosition({ x: 0, y: 0 });
-                setSize(null);
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              className="w-3.5 h-3.5 rounded-full bg-[#28c840] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
-            >
-              <RxSize
-                className="hidden group-hover/traffic:block text-black"
-                size={8}
-              />
-            </button>
+            {!isMobile && (
+              <button
+                onClick={() => minimizeApp(appId)}
+                onMouseDown={(e) => e.stopPropagation()}
+                className="w-3.5 h-3.5 rounded-full bg-[#febc2e] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
+              >
+                <FiMinus
+                  className="hidden group-hover/traffic:block text-black"
+                  size={10}
+                />
+              </button>
+            )}
+            {!isMobile && (
+              <button
+                onClick={() => {
+                  setIsMaximized(!isMaximized);
+                  setPosition({ x: 0, y: 0 });
+                  setSize(null);
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                className="w-3.5 h-3.5 rounded-full bg-[#28c840] hover:brightness-110 transition-colors cursor-pointer flex items-center justify-center"
+              >
+                <RxSize
+                  className="hidden group-hover/traffic:block text-black"
+                  size={8}
+                />
+              </button>
+            )}
           </div>
           <span className="ml-2 text-white/60 text-xs">{title}</span>
         </div>

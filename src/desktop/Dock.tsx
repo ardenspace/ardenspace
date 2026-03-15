@@ -70,13 +70,16 @@ export default function Dock() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-40">
-      <div className="glass-frosted flex items-center justify-center py-3 px-3">
-        <div className="flex items-center gap-4 px-2">
+    <div className="absolute bottom-2 md:bottom-3 left-1/2 -translate-x-1/2 z-40 max-w-[98vw]">
+      <div className="glass-frosted flex items-center justify-center py-2 px-2 md:py-3 md:px-3">
+        <div className="flex items-center gap-2 md:gap-4 px-1 md:px-2">
           {dockItems.map((item) => {
             const isOpen = openApps.includes(item.id);
             return (
-              <div key={item.id} className="relative flex flex-col items-center">
+              <div
+                key={item.id}
+                className="relative flex flex-col items-center"
+              >
                 {/* Tooltip */}
                 {hoveredId === item.id && (
                   <div className="absolute -top-13 left-1/2 -translate-x-1/2 whitespace-nowrap">
@@ -99,7 +102,7 @@ export default function Dock() {
                   }}
                   onMouseEnter={() => setHoveredId(item.id)}
                   onMouseLeave={() => setHoveredId(null)}
-                  className="glass-button rounded-xl w-12 h-12 flex items-center justify-center text-white/80 cursor-pointer"
+                  className="glass-button rounded-xl w-9.5 h-9.5 md:w-12 md:h-12 flex items-center justify-center text-white/80 cursor-pointer [&>svg]:w-[23px] [&>svg]:h-[23px] md:[&>svg]:w-auto md:[&>svg]:h-auto"
                 >
                   {item.icon}
                 </button>
