@@ -1,0 +1,25 @@
+<div align="center">
+
+![Typing SVG](https://readme-typing-svg.demolab.com?font=Trebuchet+MS&weight=400&size=14&pause=1000&color=000000&center=true&vCenter=true&repeat=false&width=500&lines=a%E2%80%89r%E2%80%89d%E2%80%89e%E2%80%89n%E2%80%89'%E2%80%89s%E2%80%89p%E2%80%89a%E2%80%89c%E2%80%89e%E3%85%A4a%E2%80%89t%E3%85%A4a%E2%80%89r%E2%80%89d%E2%80%89e%E2%80%89n%E2%80%89'%E2%80%89s%E3%85%A4p%E2%80%89a%E2%80%89c%E2%80%89e%E2%80%89!%E3%85%A4🛸)
+
+<img src="assets/thumbnail.gif" width="100%" />
+
+### DASOM LEE (ARDEN)
+
+![Subtitle](https://readme-typing-svg.demolab.com?font=Trebuchet+MS&weight=400&size=14&pause=9999999&color=000000&center=true&vCenter=true&repeat=false&duration=1&width=280&height=30&lines=—+Fullstack+Engineer+%26+Creator)
+
+·
+
+**Interactive · 3D · AI**
+
+·
+
+`TypeScript` `React` `Next.js` `React Native` `Flutter` `Three.js`
+
+`Docker` `Python` `FastAPI` `PostgreSQL` `Nginx` `Supabase` `Cloudflare` `Ollama`
+
+·
+
+🔗 [LinkedIn](https://www.linkedin.com/in/ardenspace/) | 📧 [Email](mailto:ardensdevspace@gmail.com) | 🛸 [arden'space](https://ardenspace.com)
+
+</div>
