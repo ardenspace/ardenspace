@@ -14,7 +14,7 @@
 
 ·
 
-`TypeScript` `React` `Next.js` `React Native` `Flutter` `Three.js`
+`TypeScript` `React` `Next.js` `Three.js` `React Native` `Flutter`
 
 `Python` `FastAPI` `PostgreSQL` `Supabase` `Docker` `Nginx` `Cloudflare` 
 
