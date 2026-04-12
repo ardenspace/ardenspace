@@ -16,7 +16,7 @@
 
 `TypeScript` `React` `Next.js` `React Native` `Flutter` `Three.js`
 
-`Docker` `Python` `FastAPI` `PostgreSQL` `Nginx` `Supabase` `Cloudflare` 
+`Python` `FastAPI` `PostgreSQL` `Supabase` `Docker` `Nginx` `Cloudflare` 
 
 `Ollama` `Llama.cpp` `Gemma 4`
 
