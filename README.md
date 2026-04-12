@@ -16,10 +16,12 @@
 
 `TypeScript` `React` `Next.js` `React Native` `Flutter` `Three.js`
 
-`Docker` `Python` `FastAPI` `PostgreSQL` `Nginx` `Supabase` `Cloudflare` `Ollama`
+`Docker` `Python` `FastAPI` `PostgreSQL` `Nginx` `Supabase` `Cloudflare` 
+
+`Ollama` `Llama.cpp` `Gemma 4`
 
 ·
 
-🔗 [LinkedIn](https://www.linkedin.com/in/ardenspace/) | 📧 [Email](mailto:ardensdevspace@gmail.com) | 🛸 [arden'space](https://ardenspace.com)
+🔗 [LinkedIn](https://www.linkedin.com/in/ardenspace/) | 📧 [Email](mailto:connect@ardenspace.com) | 🛸 [arden'space](https://ardenspace.com)
 
 </div>
