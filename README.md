@@ -6,7 +6,7 @@
 
 ### DASOM LEE (ARDEN)
 
-![Subtitle](https://readme-typing-svg.demolab.com?font=Trebuchet+MS&weight=400&size=14&pause=9999999&color=000000&center=true&vCenter=true&repeat=false&duration=1&width=280&height=30&lines=—+Fullstack+Engineer+%26+AI+Product+Builder)
+![Subtitle](https://readme-typing-svg.demolab.com?font=Trebuchet+MS&weight=400&size=14&pause=9999999&color=000000&center=true&vCenter=true&repeat=false&duration=1&width=280&height=30&lines=—+AI+Product+Engineer+%26+Fullstack)
 
 ·
 
