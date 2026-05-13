@@ -10,7 +10,7 @@
 
 ·
 
-**Interactive · 3D · AI**
+**Interactive · Product · AI**
 
 ·
 
